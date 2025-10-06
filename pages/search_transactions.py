@@ -1,20 +1,14 @@
 import streamlit as st
-from datetime import datetime, timedelta, date
-from utils import transactions
-import matplotlib.pyplot as plt
-import altair as alt
+from datetime import datetime
+from utils import transactions, skinport_url
 import pandas as pd
-import base64
-import requests
-from dotenv import load_dotenv
-import os
-from collections import defaultdict
 
 
 def get_transaction_manager():
     """Retrieve the transaction manager from Streamlit session state."""
     if "transactionManager" not in st.session_state:
-        st.error("you must load the data on the dashboard, before using this page")
+        st.error("you must load the data on the home page, before using this page")
+        return None
     return st.session_state.transactionManager
 
 
@@ -82,7 +76,7 @@ def load_transactions_by_item_name(item_name: str, type_filter):
                         "Item": name,
                         "Amount (EUR)": item.get("amount", 0.0),
                         "Type": entry.get('type', "Unknown"),
-                        "Sale ID": item.get("sale_id", "N/A")
+                        "link": skinport_url.to_item_url(name, str(item.get("sale_id", "0")))
                     })
 
     if not matches:
@@ -90,9 +84,21 @@ def load_transactions_by_item_name(item_name: str, type_filter):
         return pd.DataFrame()
 
     df = pd.DataFrame(matches)
-    df = df.sort_values("Date", ascending=False)
-    st.dataframe(df.reset_index(drop=True), height=600)
-    return df
+    df = df.sort_values("Date", ascending=False).reset_index(drop=True)
+
+    st.data_editor(
+        df,
+        height=600,
+        column_config={
+            "link": st.column_config.LinkColumn(
+                "Link",
+                display_text="Open Link"
+            ),
+            "Amount (EUR)": st.column_config.NumberColumn("Amount (EUR)", format="%.2f €"),
+            "Date": st.column_config.DatetimeColumn("Date", format="YYYY-MM-DD HH:mm:ss"),
+        },
+        hide_index=True,
+    )
 
 
 st.subheader("Search through the transaction history")

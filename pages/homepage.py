@@ -141,7 +141,7 @@ def get_country_distribution(start_date: date, end_date: date):
                 entry_date = datetime.strptime(
                     entry_date_str, "%Y-%m-%dT%H:%M:%SZ").date()
             except ValueError:
-                continue  # skip invalid date
+                continue
 
         # Skip if outside the date range
         if entry_date < start_date or entry_date > end_date:
@@ -184,12 +184,10 @@ def load_date_boxes():
             st.session_state.start_date = today - timedelta(days=value)
             st.session_state.end_date = today
 
-        # Checkbox to exclude fees from totals
         with column_days[0]:
             st.session_state.fees_bool = st.checkbox(
                 "Exclude fees", help="The amounts shown include Skinport fees. If the checkbox is enabled, you will see only the amount you received.")
 
-        # Quick filters for last 7, 30, or 365 days
         with column_days[len(column_days)-3]:
             st.button("last 7 days", on_click=lambda: set_days(7))
         with column_days[len(column_days)-2]:
@@ -241,6 +239,7 @@ if st.session_state.transactions_clicked:
     if clientId == "" or clientSecret == "":
         st.error("Please insert the API Keys")
     else:
+        get_transaction_manager()
         load_date_boxes()
         load_transaction_graph()
         load_countryDistribution_graph()
