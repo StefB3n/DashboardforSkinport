@@ -1,6 +1,6 @@
 # Skinport Transactions Dashboard
 
-A dashboard to visualize and analyze your Skinport transactions, with a focus on searching specific items and tracking payout history.
+A dashboard to visualize and analyze your Skinport transactions, with the option of searching specific items and tracking payout history.
 
 Note: This project is not affiliated with Skinport. It is an independent tool created to make it easier to view and analyze your transaction history via the Skinport API.
 
