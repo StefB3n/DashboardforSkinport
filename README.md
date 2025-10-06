@@ -12,6 +12,8 @@ Note: This project is not affiliated with Skinport. It is an independent tool cr
 * View **total sales per buyer country**
 
 ## Examples
+<img width="1687" height="780" alt="image" src="https://github.com/user-attachments/assets/2b614c46-4a33-41f4-923f-2e60e594d02a" />
+
 <img width="958" height="618" alt="image" src="https://github.com/user-attachments/assets/9b29382d-36be-41bf-8ee2-4b13a0455ef7" />
 <img width="938" height="433" alt="image" src="https://github.com/user-attachments/assets/3d8b73bb-b5e6-4d6a-b43f-9016f3deff31" />
 
