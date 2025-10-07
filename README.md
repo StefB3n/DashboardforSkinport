@@ -21,6 +21,9 @@ Note: This project is not affiliated with Skinport. It is an independent tool cr
 
 ## Installation
 
+You can access the dashboard directly from https://tradingdashboardskinport.streamlit.app/
+it's hosted directly with streamlit cloud hosting, it follows a secondary branch of the project to avoid incompatibilities
+
 1. **Clone the repository**
 
 ```bash
