@@ -1,31 +1,17 @@
 import streamlit as st
 from datetime import datetime, timedelta, date
 import pandas as pd
-from dotenv import load_dotenv
-import os
 from collections import defaultdict
 from utils import transactions
-
-# Load environment variables from .env file
-load_dotenv()
-
-
-def save_keys(secret_id, client_secret):
-    """Save API keys to the .env file."""
-    with open(".env", "w") as f:
-        f.write(f"API_CLIENT_ID={secret_id}\n")
-        f.write(f"API_CLIENT_SECRET={client_secret}\n")
 
 
 # Streamlit container to input and save API keys
 with st.container(border=True):
     st.subheader("Skinport API keys")
     clientId = st.text_input("Client ID", key="client_id",
-                             type="password", value=os.getenv("API_CLIENT_ID"), help="Found in https://skinport.com/account")
+                             type="password", help="Found in https://skinport.com/account")
     clientSecret = st.text_input(
-        "Client Secret", key="client_secret", type="password", value=os.getenv("API_CLIENT_SECRET"), help="Found in https://skinport.com/account")
-    if st.button("Save 💾"):
-        save_keys(clientId, clientSecret)
+        "Client Secret", key="client_secret", type="password", help="Found in https://skinport.com/account")
 
 
 @st.cache_resource
