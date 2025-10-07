@@ -60,8 +60,7 @@ def transaction_graph_data(start_date_filter, end_date_filter):
     )
     average_length = averages_dict[average_length_key]
 
-    with st.spinner("Getting all the transaction data...", show_time=True):
-        data = get_transaction_manager().transactions
+    data = get_transaction_manager().transactions
 
     # Process transactions within date range
     for item in data:
@@ -239,7 +238,8 @@ if st.session_state.transactions_clicked:
     if clientId == "" or clientSecret == "":
         st.error("Please insert the API Keys")
     else:
-        get_transaction_manager()
+        with st.spinner("Getting all the transaction data...", show_time=True):
+            get_transaction_manager()
         load_date_boxes()
         load_transaction_graph()
         load_countryDistribution_graph()
