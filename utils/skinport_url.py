@@ -12,14 +12,6 @@ def _normalize_text(text: str) -> str:
 
 
 def _slugify_item(title: str) -> str:
-    """
-    Convert full CS:GO item title into a Skinport item slug.
-    Examples:
-        '★ Butterfly Knife | Marble Fade (Factory New)' ->
-        'butterfly-knife-marble-fade-factory-new'
-        'StatTrak™ AK-47 | Redline (Field-Tested)' ->
-        'stattrak-ak-47-redline-field-tested'
-    """
     title = _normalize_text(title)
     title = title.replace("StatTrak", "stattrak")
     title = re.sub(r"[★™]", "", title)

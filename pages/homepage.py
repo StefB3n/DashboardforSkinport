@@ -19,7 +19,7 @@ def save_keys(secret_id, client_secret):
 
 # Streamlit container to input and save API keys
 with st.container(border=True):
-    st.subheader("API keys")
+    st.subheader("Skinport API keys")
     clientId = st.text_input("Client ID", key="client_id",
                              type="password", value=os.getenv("API_CLIENT_ID"), help="Found in https://skinport.com/account")
     clientSecret = st.text_input(
