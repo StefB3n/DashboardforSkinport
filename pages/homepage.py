@@ -43,6 +43,49 @@ def get_transaction_manager():
     return st.session_state.transactionManager
 
 
+def get_total_transactions(start_date_filter, end_date_filter):
+    """Print total bought and sold values within the date range"""
+    total_credit = 0
+    total_purchase = 0
+
+    data = get_transaction_manager().transactions
+
+    for item in data:
+        updated_at = datetime.strptime(
+            item["updated_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        date = updated_at.date()
+
+        if date < start_date_filter or date > end_date_filter:
+            continue
+
+        type_ = item["type"]
+
+        if type_ == "credit":
+            amount = exclude_fees(item.get("amount", 0), item.get(
+                "fee"), st.session_state.fees_bool)
+            total_credit += amount
+        elif type_ == "purchase":
+            amount = item.get("amount", 0)
+            total_purchase += amount
+
+    return total_purchase, total_credit
+
+
+def load_total_transactions():
+    totals = get_total_transactions(
+        st.session_state.start_date, st.session_state.end_date)
+
+    with st.container(border=True):
+        column_totals = st.columns(2, gap="Small")
+        with column_totals[0]:
+            st.write("Total Purchased:")
+            st.write(round(totals[0], 2))
+
+        with column_totals[1]:
+            st.write("Total Sold:")
+            st.write(round(totals[1], 2))
+
+
 def transaction_graph_data(start_date_filter, end_date_filter):
     """Process transaction data and return rolling averages for graphing."""
     daily_totals = {}
@@ -53,7 +96,6 @@ def transaction_graph_data(start_date_filter, end_date_filter):
         'Monthly': 30
     }
 
-    # Streamlit selectbox for rolling average smoothing
     average_length_key = st.selectbox(
         "Rolling Average Smoothing",
         averages_dict.keys(),  help="Does a rolling average on the graph data, if Nothing is selected the data is not changed"
@@ -62,13 +104,12 @@ def transaction_graph_data(start_date_filter, end_date_filter):
 
     data = get_transaction_manager().transactions
 
-    # Process transactions within date range
     for item in data:
         updated_at = datetime.strptime(
             item["updated_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
         date = updated_at.date()
         if date < start_date_filter or date > end_date_filter:
-            continue  # skip outside filter
+            continue
 
         type_ = item["type"]
 
@@ -90,7 +131,7 @@ def transaction_graph_data(start_date_filter, end_date_filter):
             daily_totals[current_date] = {"credit": 0, "purchase": 0}
         current_date += timedelta(days=1)
 
-    # Compute rolling averages
+    # rolling averages
     dates = sorted(daily_totals.keys())[average_length:]
     credit_rolling, purchase_rolling = [], []
 
@@ -119,7 +160,6 @@ def exclude_fees(amount, fee, sum_it: bool):
 
 
 def get_country_distribution(start_date: date, end_date: date):
-    """Return total sold amounts per buyer country within the specified date range."""
     data = get_transaction_manager().get_sold()
     buyer_totals = defaultdict(float)
 
@@ -131,7 +171,6 @@ def get_country_distribution(start_date: date, end_date: date):
         if not entry_date_str:
             continue
 
-        # Try parsing with or without milliseconds
         try:
             entry_date = datetime.strptime(
                 entry_date_str, "%Y-%m-%dT%H:%M:%S.%fZ").date()
@@ -142,15 +181,14 @@ def get_country_distribution(start_date: date, end_date: date):
             except ValueError:
                 continue
 
-        # Skip if outside the date range
         if entry_date < start_date or entry_date > end_date:
             continue
 
         for item in entry["items"]:
             buyer_country = item.get("buyer_country")
             if buyer_country:
-                buyer_totals[buyer_country] += exclude_fees(
-                    item.get("amount", 0), item.get("fee"), st.session_state.fees_bool)
+                buyer_totals[buyer_country] += exclude_fees(item.get("amount", 0), entry.get(
+                    "fee"), st.session_state.fees_bool)
 
     return buyer_totals
 
@@ -241,5 +279,6 @@ if st.session_state.transactions_clicked:
         with st.spinner("Getting all the transaction data...", show_time=True):
             get_transaction_manager()
         load_date_boxes()
+        load_total_transactions()
         load_transaction_graph()
         load_countryDistribution_graph()
