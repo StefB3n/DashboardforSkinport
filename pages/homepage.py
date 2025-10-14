@@ -96,6 +96,49 @@ def transaction_graph_data(start_date_filter, end_date_filter):
     return dates, credit_rolling, purchase_rolling
 
 
+def get_total_transactions(start_date_filter, end_date_filter):
+    """Print total bought and sold values within the date range"""
+    total_credit = 0
+    total_purchase = 0
+
+    data = get_transaction_manager().transactions
+
+    for item in data:
+        updated_at = datetime.strptime(
+            item["updated_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        date = updated_at.date()
+
+        if date < start_date_filter or date > end_date_filter:
+            continue
+
+        type_ = item["type"]
+
+        if type_ == "credit":
+            amount = exclude_fees(item.get("amount", 0), item.get(
+                "fee"), st.session_state.fees_bool)
+            total_credit += amount
+        elif type_ == "purchase":
+            amount = item.get("amount", 0)
+            total_purchase += amount
+
+    return total_purchase, total_credit
+
+
+def load_total_transactions():
+    totals = get_total_transactions(
+        st.session_state.start_date, st.session_state.end_date)
+
+    with st.container(border=True):
+        column_totals = st.columns(2, gap="Small")
+        with column_totals[0]:
+            st.write("Total Purchased:")
+            st.write(round(totals[0], 2))
+
+        with column_totals[1]:
+            st.write("Total Sold:")
+            st.write(round(totals[1], 2))
+
+
 def exclude_fees(amount, fee, sum_it: bool):
     """Return amount excluding fees if sum_it is True, otherwise return original amount."""
     if sum_it:
@@ -224,5 +267,6 @@ if st.session_state.transactions_clicked:
         with st.spinner("Getting all the transaction data...", show_time=True):
             get_transaction_manager()
         load_date_boxes()
+        load_total_transactions()
         load_transaction_graph()
         load_countryDistribution_graph()
