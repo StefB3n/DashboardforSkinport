@@ -105,7 +105,6 @@ def exclude_fees(amount, fee, sum_it: bool):
 
 
 def get_country_distribution(start_date: date, end_date: date):
-    """Return total sold amounts per buyer country within the specified date range."""
     data = get_transaction_manager().get_sold()
     buyer_totals = defaultdict(float)
 
@@ -117,7 +116,6 @@ def get_country_distribution(start_date: date, end_date: date):
         if not entry_date_str:
             continue
 
-        # Try parsing with or without milliseconds
         try:
             entry_date = datetime.strptime(
                 entry_date_str, "%Y-%m-%dT%H:%M:%S.%fZ").date()
@@ -128,15 +126,14 @@ def get_country_distribution(start_date: date, end_date: date):
             except ValueError:
                 continue
 
-        # Skip if outside the date range
         if entry_date < start_date or entry_date > end_date:
             continue
 
         for item in entry["items"]:
             buyer_country = item.get("buyer_country")
             if buyer_country:
-                buyer_totals[buyer_country] += exclude_fees(
-                    item.get("amount", 0), item.get("fee"), st.session_state.fees_bool)
+                buyer_totals[buyer_country] += exclude_fees(item.get("amount", 0), entry.get(
+                    "fee"), st.session_state.fees_bool)
 
     return buyer_totals
 
