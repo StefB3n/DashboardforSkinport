@@ -8,7 +8,7 @@ search_transactions = st.Page("pages/search_transactions.py", title="Search Tran
 
 page = st.navigation(
     {
-        "Dashboard": [main, search_transactions]
+        "Dashboard": [main]
     }
 )
 st.set_page_config(page_title="Skinport Dashboard",
